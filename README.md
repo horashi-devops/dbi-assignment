@@ -11,9 +11,6 @@ Dự án bao gồm các tập tin chính sau:
 *   **[`Setup.sql`](#)**: Script dùng để khởi tạo cơ sở dữ liệu (`AttendanceDB`), tạo các bảng (Tables) kèm ràng buộc (Khóa chính, Khóa ngoại) và chèn dữ liệu mẫu (Dummy Data).
 *   **[`Query.sql`](#)**: Tập hợp các câu lệnh SQL truy vấn dữ liệu từ cơ bản đến nâng cao (Xem danh sách lớp, thống kê sĩ số, lịch sử điểm danh, báo cáo vắng mặt...).
 *   *(Thêm link hoặc tên file Sơ đồ ER của bạn vào đây, ví dụ: `ER_Diagram.drawio.png`)*
-
-> 🔗 **Lưu ý:** Thay thế dấu `#` ở trên bằng đường dẫn (Link) thực tế tới các file của bạn trên GitHub hoặc Google Drive.
-
 ---
 
 ## 🚀 Hướng dẫn cài đặt và sử dụng
