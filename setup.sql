@@ -1,86 +1,108 @@
 -- ==============================================================================
 -- 1. TẠO DATABASE VÀ CHỌN DATABASE
 -- ==============================================================================
-CREATE DATABASE IF NOT EXISTS AttendanceDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+IF DB_ID('AttendanceDB') IS NULL
+BEGIN
+    CREATE DATABASE AttendanceDB;
+END
+GO
+
 USE AttendanceDB;
+GO
 
 -- ==============================================================================
 -- 2. TẠO CẤU TRÚC CÁC BẢNG (TABLES)
 -- ==============================================================================
 
 -- Bảng Semester
-CREATE TABLE IF NOT EXISTS Semester (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    SemesterCode VARCHAR(20) UNIQUE NOT NULL, 
-    SemesterName VARCHAR(100) NOT NULL
+IF OBJECT_ID('Semester', 'U') IS NULL
+CREATE TABLE Semester (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    SemesterCode NVARCHAR(20) UNIQUE NOT NULL, 
+    SemesterName NVARCHAR(100) NOT NULL
 );
+GO
 
 -- Bảng Course
-CREATE TABLE IF NOT EXISTS Course (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    CourseCode VARCHAR(20) UNIQUE NOT NULL,
-    CourseName VARCHAR(255) NOT NULL,
+IF OBJECT_ID('Course', 'U') IS NULL
+CREATE TABLE Course (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    CourseCode NVARCHAR(20) UNIQUE NOT NULL,
+    CourseName NVARCHAR(255) NOT NULL,
     Credits INT NOT NULL
 );
+GO
 
 -- Bảng Student
-CREATE TABLE IF NOT EXISTS Student (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    StudentCode VARCHAR(20) UNIQUE NOT NULL,
-    FullName VARCHAR(100) NOT NULL,
-    Email VARCHAR(100)
+IF OBJECT_ID('Student', 'U') IS NULL
+CREATE TABLE Student (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    StudentCode NVARCHAR(20) UNIQUE NOT NULL,
+    FullName NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(100)
 );
+GO
 
 -- Bảng Teacher
-CREATE TABLE IF NOT EXISTS Teacher (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    TeacherCode VARCHAR(20) UNIQUE NOT NULL,
-    FullName VARCHAR(100) NOT NULL,
-    Email VARCHAR(100)
+IF OBJECT_ID('Teacher', 'U') IS NULL
+CREATE TABLE Teacher (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    TeacherCode NVARCHAR(20) UNIQUE NOT NULL,
+    FullName NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(100)
 );
+GO
 
 -- Bảng Class
-CREATE TABLE IF NOT EXISTS Class (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    ClassCode VARCHAR(50) NOT NULL,
+IF OBJECT_ID('Class', 'U') IS NULL
+CREATE TABLE Class (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ClassCode NVARCHAR(50) NOT NULL,
     CourseId INT NOT NULL,
     SemesterId INT NOT NULL,
     FOREIGN KEY (CourseId) REFERENCES Course(Id),
     FOREIGN KEY (SemesterId) REFERENCES Semester(Id)
 );
+GO
 
 -- Bảng Enrollment
-CREATE TABLE IF NOT EXISTS Enrollment (
+IF OBJECT_ID('Enrollment', 'U') IS NULL
+CREATE TABLE Enrollment (
     StudentId INT NOT NULL,
     ClassId INT NOT NULL,
     PRIMARY KEY (StudentId, ClassId),
     FOREIGN KEY (StudentId) REFERENCES Student(Id),
     FOREIGN KEY (ClassId) REFERENCES Class(Id)
 );
+GO
 
 -- Bảng ClassSession
-CREATE TABLE IF NOT EXISTS ClassSession (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
+IF OBJECT_ID('ClassSession', 'U') IS NULL
+CREATE TABLE ClassSession (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
     ClassId INT NOT NULL,
     TeacherId INT NOT NULL,
     SessionDate DATE NOT NULL,
-    Room VARCHAR(50),
-    TimeSlot VARCHAR(20),
+    Room NVARCHAR(50),
+    TimeSlot NVARCHAR(20),
     FOREIGN KEY (ClassId) REFERENCES Class(Id),
     FOREIGN KEY (TeacherId) REFERENCES Teacher(Id)
 );
+GO
 
 -- Bảng Attendance
-CREATE TABLE IF NOT EXISTS Attendance (
+IF OBJECT_ID('Attendance', 'U') IS NULL
+CREATE TABLE Attendance (
     SessionId INT NOT NULL,
     StudentId INT NOT NULL,
-    Status ENUM('Present', 'Absent', 'ExcusedAbsent') DEFAULT 'Present', 
-    Notes TEXT,
-    AttendanceTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Status NVARCHAR(20) DEFAULT 'Present' CHECK (Status IN ('Present', 'Absent', 'ExcusedAbsent')), 
+    Notes NVARCHAR(MAX),
+    AttendanceTime DATETIME DEFAULT GETDATE(),
     PRIMARY KEY (SessionId, StudentId),
     FOREIGN KEY (SessionId) REFERENCES ClassSession(Id),
     FOREIGN KEY (StudentId) REFERENCES Student(Id)
 );
+GO
 
 -- ==============================================================================
 -- 3. CHÈN DỮ LIỆU MẪU (DUMMY DATA)
@@ -88,53 +110,48 @@ CREATE TABLE IF NOT EXISTS Attendance (
 
 -- Thêm dữ liệu vào bảng Semester
 INSERT INTO Semester (SemesterCode, SemesterName) VALUES 
-('FA26', 'Fall 2026'),
-('SP27', 'Spring 2027');
+(N'FA26', N'Fall 2026'),
+(N'SP27', N'Spring 2027');
 
 -- Thêm dữ liệu vào bảng Course
 INSERT INTO Course (CourseCode, CourseName, Credits) VALUES 
-('INT3111', 'Database Systems', 3),
-('PRF192', 'Programming Fundamentals', 3),
-('SWE201', 'Software Engineering', 3);
+(N'INT3111', N'Database Systems', 3),
+(N'PRF192', N'Programming Fundamentals', 3),
+(N'SWE201', N'Software Engineering', 3);
 
 -- Thêm dữ liệu vào bảng Student
 INSERT INTO Student (StudentCode, FullName, Email) VALUES 
-('HE180001', 'Nguyen Van A', 'anvhe180001@fpt.edu.vn'),
-('HE180002', 'Tran Thi B', 'btthe180002@fpt.edu.vn'),
-('HE180003', 'Le Van C', 'clvhe180003@fpt.edu.vn');
+(N'HE180001', N'Nguyen Van A', N'anvhe180001@fpt.edu.vn'),
+(N'HE180002', N'Tran Thi B', N'btthe180002@fpt.edu.vn'),
+(N'HE180003', N'Le Van C', N'clvhe180003@fpt.edu.vn');
 
 -- Thêm dữ liệu vào bảng Teacher
 INSERT INTO Teacher (TeacherCode, FullName, Email) VALUES 
-('TC001', 'Nguyen Hoang D', 'hoangd@fpt.edu.vn'),
-('TC002', 'Pham Thi E', 'thiep@fpt.edu.vn');
+(N'TC001', N'Nguyen Hoang D', N'hoangd@fpt.edu.vn'),
+(N'TC002', N'Pham Thi E', N'thiep@fpt.edu.vn');
 
 -- Thêm dữ liệu vào bảng Class 
--- Giả sử: Lớp 1 học Database (Id=1) vào kỳ FA26 (Id=1), Lớp 2 học PRF192 (Id=2) vào kỳ FA26
 INSERT INTO Class (ClassCode, CourseId, SemesterId) VALUES 
-('SE1801_INT3111', 1, 1),
-('SE1802_PRF192', 2, 1);
+(N'SE1801_INT3111', 1, 1),
+(N'SE1802_PRF192', 2, 1);
 
--- Thêm dữ liệu vào bảng Enrollment (Sinh viên đăng ký lớp)
--- Sinh viên A (Id=1) và B (Id=2) đăng ký lớp Database (Id=1)
--- Sinh viên C (Id=3) đăng ký lớp C Programming (Id=2)
+-- Thêm dữ liệu vào bảng Enrollment
 INSERT INTO Enrollment (StudentId, ClassId) VALUES 
 (1, 1), 
 (2, 1), 
 (3, 2);
 
--- Thêm dữ liệu vào bảng ClassSession (Tạo các buổi học)
--- Lớp Database (Id=1) do Thầy D (Id=1) dạy vào 2 ngày khác nhau
+-- Thêm dữ liệu vào bảng ClassSession
 INSERT INTO ClassSession (ClassId, TeacherId, SessionDate, Room, TimeSlot) VALUES 
-(1, 1, '2026-09-01', 'Room 201', 'Slot 1'),
-(1, 1, '2026-09-03', 'Room 201', 'Slot 1');
+(1, 1, '2026-09-01', N'Room 201', N'Slot 1'),
+(1, 1, '2026-09-03', N'Room 201', N'Slot 1');
 
--- Thêm dữ liệu vào bảng Attendance (Điểm danh sinh viên cho buổi học)
--- Buổi học thứ 1 (Id=1) của lớp Database: Sinh viên A (Id=1) có mặt, Sinh viên B (Id=2) vắng mặt
+-- Thêm dữ liệu vào bảng Attendance
 INSERT INTO Attendance (SessionId, StudentId, Status, Notes) VALUES 
-(1, 1, 'Present', 'Good'),
-(1, 2, 'Absent', 'Overslept');
+(1, 1, N'Present', N'Good'),
+(1, 2, N'Absent', N'Overslept');
 
--- Buổi học thứ 2 (Id=2) của lớp Database: Sinh viên A (Id=1) có mặt, Sinh viên B (Id=2) vắng có phép
 INSERT INTO Attendance (SessionId, StudentId, Status, Notes) VALUES 
-(2, 1, 'Present', ''),
-(2, 2, 'ExcusedAbsent', 'Sick leave approved');
+(2, 1, N'Present', N''),
+(2, 2, N'ExcusedAbsent', N'Sick leave approved');
+GO
